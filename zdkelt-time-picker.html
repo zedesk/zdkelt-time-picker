@@ -1,0 +1,147 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-selector/iron-selector.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="zdkelt-clock.html">
+
+<dom-module id="zdkelt-time-picker">
+	<template>
+		<style>
+			:host {
+				position: relative;
+				display: block;
+				box-sizing: border-box;
+				width: 250px;
+				height: 300px;
+				overflow: hidden;
+				@apply(--layout-vertical);
+				@apply(--paper-font-body1);
+			}
+
+			#time-picker {
+				margin: 0px;
+				padding: 0px;
+			}
+
+			.hour {
+				font-size: 40px !important;
+				text-align: center;
+				line-height: 50px !important;
+				height: 50px;
+				background: var(--default-primary-color);
+				color: lightgray;
+			}
+
+			.hour div.iron-selected {
+				color: white;
+			}
+
+			zdkelt-clock {
+				position: relative;
+				width: 100%;
+			}
+
+			section {
+				display: none;
+				margin: 10px;
+				color: lightgray;
+			}
+
+			section.iron-selected {
+				display: block;
+			}
+		</style>
+		<div class="hour">
+			<iron-selector class="time layout horizontal center-center" attr-for-selected="name" selected="{{view}}">
+				<div name="hours">{{hours}}</div>
+				<div>:</div>
+				<div name="minutes">{{minutes}}</div>
+			</iron-selector>
+		</div>
+		<div class="flex">
+			<iron-selector id="selectors" selected="{{view}}" attr-for-selected="name" on-iron-select="_clockSelect">
+
+				<section name="minutes">
+					<zdkelt-clock minutes id="minuteClock" value="{{minutes}}"
+					              on-update="_minutesChange" on-change="_setMinutes"></zdkelt-clock>
+				</section>
+				<section name="hours">
+					<zdkelt-clock id="hourClock" value="{{hours}}" on-update="_hourChange"
+					              on-change="_setHours"></zdkelt-clock>
+				</section>
+			</iron-selector>
+		</div>
+	</template>
+	<script>
+		Polymer({
+			is            : 'zdkelt-time-picker',
+			properties    : {
+				value  : {
+					type              : String,
+					value             : '00:00',
+					reflectToAttribute: true,
+					observer          : '_valueChanged'
+				},
+				view   : {
+					type : String,
+					value: 'hours'
+				},
+				hours  : {
+					type : String,
+					value: '00'
+				},
+				minutes: {
+					type : String,
+					value: '00'
+				}
+			},
+			ready         : function () {
+				this.refresh();
+			},
+			refresh       : function () {
+				this.$.hourClock.refresh();
+				this.$.minuteClock.refresh();
+			},
+			_valueChanged : function (newValue) {
+                if(!newValue) {
+                    this.value = this.hours + ':' + this.minutes;
+                    return;
+                }
+				var tmp = newValue.match(/(\d+):(\d+)/);
+				if (tmp) {
+					this.set('hours', tmp[1]);
+					this.set('minutes', tmp[2]);
+				}
+			},
+			_hourChange   : function (evt) {
+				this.set('hours', evt.detail);
+				this._value = this.hours + ':' + this.minutes;
+			},
+			_minutesChange: function (evt) {
+				this.set('minutes', evt.detail);
+				this._value = this.hours + ':' + this.minutes;
+			},
+            _setHours: function() {
+                this.set('value',this.hours+':'+this.minutes);
+                this._selectMinutes();
+            },
+            _setMinutes: function() {
+	            this.set('value',this.hours+':'+this.minutes);
+            },
+			_selectMinutes: function () {
+				this.set('view', 'minutes');
+			},
+			_clockSelect  : function (evt) {
+				switch (evt.detail.item.getAttribute('name')) {
+					case 'minutes':
+						this.$.minuteClock.refresh();
+						break;
+					case 'hours':
+						this.$.hourClock.refresh();
+						break;
+				}
+			}
+		});
+	</script>
+</dom-module>
