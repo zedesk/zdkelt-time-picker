@@ -5,6 +5,18 @@
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="zdkelt-clock.html">
 
+<!--
+A time picker component
+
+version : __1.0.0-rc1__
+
+Example:
+
+    <zdkelt-time-picker value="17:00"></zdkelt-time-picker>
+
+@group zdk Elements
+@demo
+-->
 <dom-module id="zdkelt-time-picker">
 	<template>
 		<style>
@@ -53,21 +65,29 @@
 			}
 		</style>
 		<div class="hour">
-			<iron-selector class="time layout horizontal center-center" attr-for-selected="name" selected="{{view}}">
+			<iron-selector class="time layout horizontal center-center"
+			               attr-for-selected="name"
+			               selected="{{view}}">
 				<div name="hours">{{hours}}</div>
 				<div>:</div>
 				<div name="minutes">{{minutes}}</div>
 			</iron-selector>
 		</div>
 		<div class="flex">
-			<iron-selector id="selectors" selected="{{view}}" attr-for-selected="name" on-iron-select="_clockSelect">
-
+			<iron-selector id="selectors"
+			               selected="{{view}}"
+			               attr-for-selected="name"
+			               on-iron-select="_clockSelect">
 				<section name="minutes">
-					<zdkelt-clock minutes id="minuteClock" value="{{minutes}}"
-					              on-update="_minutesChange" on-change="_setMinutes"></zdkelt-clock>
+					<zdkelt-clock minutes id="minuteClock"
+					              value="{{minutes}}"
+					              on-update="_minutesChange"
+					              on-change="_setMinutes"></zdkelt-clock>
 				</section>
 				<section name="hours">
-					<zdkelt-clock id="hourClock" value="{{hours}}" on-update="_hourChange"
+					<zdkelt-clock id="hourClock"
+					              value="{{hours}}"
+					              on-update="_hourChange"
 					              on-change="_setHours"></zdkelt-clock>
 				</section>
 			</iron-selector>
@@ -75,64 +95,67 @@
 	</template>
 	<script>
 		Polymer({
-			is            : 'zdkelt-time-picker',
-			properties    : {
-				value  : {
-					type              : String,
-					value             : '00:00',
+			is: 'zdkelt-time-picker',
+			properties: {
+				value: {
+					type: String,
+					value: '00:00',
 					reflectToAttribute: true,
-					observer          : '_valueChanged'
+					observer: '_valueChanged'
 				},
-				view   : {
-					type : String,
+				view: {
+					type: String,
 					value: 'hours'
 				},
-				hours  : {
-					type : String,
+				hours: {
+					type: String,
 					value: '00'
 				},
 				minutes: {
-					type : String,
+					type: String,
 					value: '00'
 				}
 			},
-			ready         : function () {
+			ready: function() {
 				this.refresh();
 			},
-			refresh       : function () {
+			refresh: function() {
 				this.$.hourClock.refresh();
 				this.$.minuteClock.refresh();
 			},
-			_valueChanged : function (newValue) {
-                if(!newValue) {
-                    this.value = this.hours + ':' + this.minutes;
-                    return;
-                }
+			_valueChanged: function(newValue) {
+				if (!newValue) {
+					this.value = this.hours + ':' + this.minutes;
+					return;
+				}
 				var tmp = newValue.match(/(\d+):(\d+)/);
 				if (tmp) {
 					this.set('hours', tmp[1]);
 					this.set('minutes', tmp[2]);
 				}
 			},
-			_hourChange   : function (evt) {
+			_hourChange: function(evt) {
 				this.set('hours', evt.detail);
 				this._value = this.hours + ':' + this.minutes;
 			},
-			_minutesChange: function (evt) {
+			_minutesChange: function(evt) {
 				this.set('minutes', evt.detail);
 				this._value = this.hours + ':' + this.minutes;
 			},
-            _setHours: function() {
-                this.set('value',this.hours+':'+this.minutes);
-                this._selectMinutes();
-            },
-            _setMinutes: function() {
-	            this.set('value',this.hours+':'+this.minutes);
-            },
-			_selectMinutes: function () {
+			_setHours: function() {
+				this.set('value', this.hours + ':' + this.minutes);
+				var that = this;
+				setTimeout(function() {
+					that._selectMinutes();
+				}, 100);
+			},
+			_setMinutes: function() {
+				this.set('value', this.hours + ':' + this.minutes);
+			},
+			_selectMinutes: function() {
 				this.set('view', 'minutes');
 			},
-			_clockSelect  : function (evt) {
+			_clockSelect: function(evt) {
 				switch (evt.detail.item.getAttribute('name')) {
 					case 'minutes':
 						this.$.minuteClock.refresh();
