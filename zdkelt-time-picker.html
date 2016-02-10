@@ -142,7 +142,7 @@ Example:
 				this.set('minutes', evt.detail);
 				this._value = this.hours + ':' + this.minutes;
 			},
-			_setHours: function() {
+			_setHours: function(evt) {
 				if ( evt ) { evt.stopPropagation(); }
 				this.set('value', this.hours + ':' + this.minutes);
 				var that = this;
@@ -151,7 +151,7 @@ Example:
 				}, 100);
 				this.fire('change',this.value);
 			},
-			_setMinutes: function() {
+			_setMinutes: function(evt) {
 				if ( evt ) { evt.stopPropagation(); }
 				this.set('value', this.hours + ':' + this.minutes);
 				this.fire('change',this.value);
