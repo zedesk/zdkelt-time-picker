@@ -143,14 +143,18 @@ Example:
 				this._value = this.hours + ':' + this.minutes;
 			},
 			_setHours: function() {
+				if ( evt ) { evt.stopPropagation(); }
 				this.set('value', this.hours + ':' + this.minutes);
 				var that = this;
 				setTimeout(function() {
 					that._selectMinutes();
 				}, 100);
+				this.fire('change',this.value);
 			},
 			_setMinutes: function() {
+				if ( evt ) { evt.stopPropagation(); }
 				this.set('value', this.hours + ':' + this.minutes);
+				this.fire('change',this.value);
 			},
 			_selectMinutes: function() {
 				this.set('view', 'minutes');
