@@ -2,6 +2,19 @@
 <link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 
+<!--
+Internal component that display the hour or minute selector
+
+version : __1.0.0-rc1__
+
+Example:
+
+	<zdkelt-clock minutes id="minuteClock" value="{{minutes}}"
+	        on-update="_minutesChange" on-change="_setMinutes"></zdkelt-clock>
+
+@group zdk Elements
+@demo
+-->
 <dom-module id="zdkelt-clock">
 	<template>
 		<style>
@@ -71,7 +84,9 @@
 			</g>
 			<g id="numbers"></g>
 			<g>
-				<circle id="select-area" r$="{{_radius}}" on-down="_startSelect" on-track="_startSelect"
+				<circle id="select-area" r$="{{_radius}}"
+				        on-down="_startSelect"
+				        on-track="_startSelect"
 				        on-up="_finishSelect"></circle>
 			</g>
 		</svg>
