@@ -11,10 +11,8 @@
     "web-component",
     "web-components",
     "polymer",
-    "calendar",
-    "date-picker",
-    "date",
-    "input"
+    "time",
+    "time-picker"
   ],
   "homepage": "https://github.com/zedesk/zdkelt-time-picker",
   "ignore": [
@@ -24,7 +22,9 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.4",
-    "moment": "^2.11.2"
+    "paper-styles": "PolymerElements/paper-styles#^1.1.3",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.2.2",
+    "iron-selector": "PolymerElements/iron-selector#^1.2.1"
   },
   "devDependencies": {
     "web-component-tester": "^4.2.0",
