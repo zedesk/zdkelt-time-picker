@@ -1,0 +1,267 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+
+<!--
+Internal component that display the hour or minute selector
+
+version : __1.0.0-rc1__
+
+Example:
+
+	<zdkelt-clock minutes id="minuteClock" value="{{minutes}}"
+	        on-update="_minutesChange" on-change="_setMinutes"></zdkelt-clock>
+
+@group zdk Elements
+@demo
+-->
+<dom-module id="zdkelt-clock">
+	<template>
+		<style>
+			:host {
+				/* display: block; */
+				position: relative;
+				@apply(--paper-font-body1);
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+
+			.bg {
+				fill: var(--divider-color);
+				cursor: default;
+			}
+
+			.dot {
+				fill: var(--default-primary-color);
+			}
+
+			.pointer-large {
+				fill: var(--light-primary-color);
+			}
+
+            .pointer-small {
+	            fill: var(--default-primary-color);
+            }
+
+            .pointer.visible .pointer-large {
+	            fill: var(--default-primary-color);
+            }
+
+			.line {
+				stroke: var(--default-primary-color);
+			}
+
+			.select {
+				fill: white;
+			}
+
+			#clock {
+				height: 100%;
+				width: 100%;
+			}
+
+			#select-area {
+				cursor: pointer;
+				fill: rgba(255, 255, 255, 0.01);
+				fill-opacity: 0;
+			}
+
+			#cursor {
+				display: none;
+			}
+		</style>
+		<svg version="1.1" viewbox="-100 -100 200 200" id="clock">
+			<g class="face">
+				<circle class="bg" r$="{{_radius}}"></circle>
+				<g id="cursor" class$="{{_getPointerClass(_selectedPoint)}}">
+					<circle class="dot" r="2"></circle>
+					<circle class="pointer-large" r="15" cx$="{{_selectedPoint.x}}" cy$="{{_selectedPoint.y}}"></circle>
+					<circle class="pointer-small" r="5" cx$="{{_selectedPoint.x}}" cy$="{{_selectedPoint.y}}"></circle>
+					<line class="line" x1="0" y1="0" x2$="{{_selectedPoint.x}}" y2$="{{_selectedPoint.y}}"></line>
+				</g>
+			</g>
+			<g id="numbers"></g>
+			<g>
+				<circle id="select-area" r$="{{_radius}}"
+				        on-down="_startSelect"
+				        on-track="_startSelect"
+				        on-up="_finishSelect"></circle>
+			</g>
+		</svg>
+	</template>
+	<script>
+		var SVG_NS = 'http://www.w3.org/2000/svg';
+
+		Polymer({
+			is              : 'zdkelt-clock',
+			properties      : {
+				/**
+				 * The radius of the clock
+				 */
+				_radius       : {
+					type : Number,
+					value: 100
+				},
+				/**
+				 * The selected index in the _numbers array
+				 */
+				_selected     : {
+					type    : Number,
+					value   : 0,
+					notify  : true,
+					observer: '_selectedChanged'
+				},
+				/**
+				 * The selected Point
+				 */
+				_selectedPoint: {
+					type  : Object,
+					value : null,
+					notify: true
+				},
+				/**
+				 * List of displayed tags
+				 */
+				_numbers      : {
+					type : Array,
+					value: []
+				},
+				/**
+				 * The value selected
+				 */
+				value         : {
+					type              : Number,
+					value             : 0,
+					reflectToAttribute: true,
+					observer          : '_valueChanged'
+				},
+				/**
+				 * Boolean flag indicates to draw minutes clock
+				 */
+				minutes       : {
+					type : Boolean,
+					value: false
+				}
+			},
+			ready           : function () {
+				this._populate();
+			},
+			refresh         : function () {
+				this._populate();
+			},
+			_valueChanged   : function (newValue) {
+				if (newValue !== null) {
+					this.set('_selected', parseInt(this.value,10) );
+				}
+			},
+			_selectedChanged: function (newValue, oldValue) {
+				// console.log('selected changed', this._selected, oldValue,this.$.numbers.childNodes.length );
+				if (this._selected !== null && this.$.numbers.childNodes[this._selected]) {
+					this.set('_selectedPoint', this._numbers[this._selected]);
+					if (oldValue !== undefined && this.$.numbers.childNodes[oldValue]) {
+						// console.log('oldValue', oldValue);
+						this.$.numbers.childNodes[oldValue].classList.remove('select');
+					}
+					this.$.numbers.childNodes[this._selected].classList.toggle('select');
+					this.fire('update', this._numbers[this._selected].label);
+				}
+			},
+			_populate       : function () {
+				var i, selected;
+				this._numbers = [];
+				var angleOffset;
+				var angle = Math.PI / 2;
+
+				// remove dom nodes since they'll be re-created
+				while (this.$.numbers.firstChild) {
+					this.$.numbers.removeChild(this.$.numbers.firstChild);
+				}
+				if (this.minutes) {
+					// For minutes circles
+					angleOffset = -360 / 60 * (Math.PI / 180);
+					for (i = 0; i < 60; i++) {
+						this._numbers.push({
+							label  : (i < 10 ? '0' : '') + i,
+							value  : i,
+							x      : 85 * Math.cos(angle + angleOffset * i),
+							y      : -85 * Math.sin(angle + angleOffset * i),
+							display: (i % 5 === 0) ? true : false
+						});
+					}
+				} else {
+					// For hours circles
+					angleOffset = -360 / 12 * (Math.PI / 180);
+					for (i = 0; i < 12; i++) {
+						this._numbers.push({
+							label  : (i < 10 ? '0' : '') + i,
+							value  : i,
+							x      : 85 * Math.cos(angle + angleOffset * i),
+							y      : -85 * Math.sin(angle + angleOffset * i),
+							display: true
+						});
+					}
+					for (i = 0; i < 12; i++) {
+						this._numbers.push({
+							label  : i + 12+'',
+							value  : i + 12,
+							x      : 55 * Math.cos(angle + angleOffset * i),
+							y      : -55 * Math.sin(angle + angleOffset * i),
+							display: true
+						});
+					}
+				}
+
+				var gNumbers = this.$.numbers;
+				this._numbers.forEach(function (number, indx) {
+					var point = document.createElementNS(SVG_NS, 'text');
+					point.textContent = number.display ? number.label : '';
+					if (this.value && number.label === this.value) {
+						selected = indx;
+					}
+					Polymer.dom(gNumbers).appendChild(point);
+					point.setAttribute('x', number.x - point.getBBox().width / 2);
+					point.setAttribute('y', number.y + point.getBBox().height / 4);
+				});
+                this._selectedChanged(selected);
+			},
+			_getPointerClass: function (obj) {
+				if (obj) {
+					this.$.cursor.style.display = 'block';
+				}
+				return 'pointer'+(obj && obj.display?' visible':'');
+			},
+			_startSelect    : function (evt) {
+				var angleOffset = -360 / (this.minutes ? 60 : 12) * (Math.PI / 180);
+				var _rect = this.getBoundingClientRect();
+
+				var x = ((evt.detail.x - _rect.left) - _rect.width / 2 ) / _rect.width;
+				var y = (evt.detail.y - _rect.top + _rect.width / 2 ) / _rect.width;
+				// coordonnées in SVG space
+				var tmp = {x: x * 200, y: y * 200};
+				var radius = Math.sqrt(tmp.x * tmp.x + tmp.y * tmp.y);
+				if (radius < 40) {
+					return;
+				}
+				// recherche le point le plus proche
+				var theta = Math.atan(tmp.y / tmp.x);
+				theta = (Math.PI / 2) + (tmp.x < 0 ? theta + Math.PI : theta);
+				var indx = Math.round(-theta / angleOffset);
+				if (!this.minutes) {
+					indx = indx > 11 ? 0 : indx;
+					indx += radius > 70 ? 0 : 12;
+				} else {
+					indx = indx > 59 ? 0 : indx;
+				}
+				if (this._selected !== indx) {
+					this.set('_selected', indx);
+				}
+			},
+			_finishSelect   : function () {
+				this.value = this._numbers[this._selected].label;
+				this.fire('change', this.value);
+			}
+		});
+	</script>
+</dom-module>
