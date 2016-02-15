@@ -4,15 +4,44 @@
 <head>
     <meta charset="utf-8">
     <title>zdk-input-time demo page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
     <link rel="import" href="../../paper-styles/paper-styles.html">
+    <link rel="import" href="../zdkelt-clock.html">
     <link rel="import" href="../zdkelt-time-picker.html">
-    <link rel="import" href="theme.html">
-    <link rel="stylesheet" href="demo.css" charset="utf-8">
+    <!--<link rel="import" href="theme.html">-->
+    <!--<link rel="stylesheet" href="demo.css" charset="utf-8">-->
+    <style>
+        zdkelt-time-picker {
+            border: 1px solid tomato;
+        }
+        .container {
+            width:200px;
+            margin:20px;
+        }
+    </style>
 </head>
 
 <body>
-    <zdkelt-time-picker></zdkelt-time-picker>
+    <div class="layout horizontal">
+    <div class="container">
+        <zdkelt-clock value="7"></zdkelt-clock>
+    </div>
+    <div class="container">
+        <zdkelt-clock minutes value="34"></zdkelt-clock>
+    </div>
+    <div class="container">
+        <zdkelt-clock hour12 value="7" meridiem="AM"></zdkelt-clock>
+    </div>
+    <div class="container">
+        <zdkelt-clock hour12 value="5" meridiem="PM"></zdkelt-clock>
+    </div>
+</div>
+<div class="layout horizontal">
+    <zdkelt-time-picker value="15:22"></zdkelt-time-picker>
+    <zdkelt-time-picker hour12 value="15:22"></zdkelt-time-picker>
+</div>
 </body>
+
 </html>
