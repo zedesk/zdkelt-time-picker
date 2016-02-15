@@ -66,19 +66,25 @@ Polymer({
         this._hourClock.refresh();
         this._minuteClock.refresh();
     },
-    toggleView: function(evt) {
-        var select = this.$.header.querySelector('.selected');
-        if (evt && evt.target === select) { return; }
-        this.$.hours.classList.toggle('selected');
-        this.$.minutes.classList.toggle('selected');
-        switch (select.id) {
-            case 'hours':
-                this.querySelector('.box').scrollTop = 240;
-                break;
-            case 'minutes':
+    setView: function(view) {
+        this.$.hours.classList.remove('selected');
+        this.$.minutes.classList.remove('selected');
+        switch(view) {
+            case "hours":
+                this.$.hours.classList.toggle('selected');
                 this.querySelector('.box').scrollTop = 0;
                 break;
+            case "minutes":
+                this.$.minutes.classList.toggle('selected');
+                this.querySelector('.box').scrollTop = 240;
+                break;
         }
+    },
+    _toggleView: function(evt) {
+        var select = this.$.header.querySelector('.selected');
+        if (evt && evt.target === select) { return; }
+        var view = select.id === 'hours'?'minutes':'hours';
+        this.setView(view);
     },
     _valueChanged: function(newValue) {
         if (!newValue) {
@@ -128,7 +134,7 @@ Polymer({
             value = this.hours + ':' + this.minutes
         }
         this.set('value', value);
-        this.toggleView();
+        this._toggleView();
         this.fire('change',this.value);
     },
     _setMinutes: function(evt) {
