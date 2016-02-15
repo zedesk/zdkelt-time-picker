@@ -1,6 +1,6 @@
 {
   "name": "zdkelt-time-picker",
-  "version": "1.0.0-rc3",
+  "version": "1.0.0-rc4",
   "description": "A time picker webcomponent",
   "main": "zdk-time-picker.html",
   "authors": [
@@ -23,8 +23,7 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.4",
     "paper-styles": "PolymerElements/paper-styles#^1.1.3",
-    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.2.2",
-    "iron-selector": "PolymerElements/iron-selector#^1.2.1"
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.2.2"
   },
   "devDependencies": {
     "web-component-tester": "^4.2.0",
