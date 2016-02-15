@@ -71,9 +71,9 @@ Example:
 		</style>
 		<div id="header" class="hour">
 			<div class="spacer"></div>
-			<div id="hours" class="selected" on-tap="toggleView">{{hours}}</div>
+			<div id="hours" class="selected" on-tap="_toggleView">{{hours}}</div>
 			<div>:</div>
-			<div id="minutes" on-tap="toggleView">{{minutes}}</div>
+			<div id="minutes" on-tap="_toggleView">{{minutes}}</div>
 			<template is="dom-if" if="{{hour12}}">
 				<div id="meridiem">{{meridiem}}</div>
 			</template>
