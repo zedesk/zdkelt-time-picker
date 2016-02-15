@@ -207,7 +207,7 @@ Example:
 			},
 			_valueChanged: function(newValue) {
 				var value;
-				if (this.hour) {
+				if (!this.minutes) {
 					value = parseInt(this.value, 10) % (this.hour12?12:24);
 				} else {
 					value = parseInt(this.value, 10);
@@ -349,7 +349,7 @@ Example:
 					item.setAttribute('x', this._numbers[0].x - item.getBBox().width / 2);
 					item.setAttribute('y', this._numbers[0].y + item.getBBox().height / 4);
 				}
-				this.fire('meridiem', this.meridiem);
+				this.fire('meridiem-change', this.meridiem);
 			}
 		});
 	</script>

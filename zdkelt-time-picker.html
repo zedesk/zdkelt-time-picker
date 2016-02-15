@@ -60,13 +60,24 @@ Example:
 				position: relative;
 				width: 100%;
 			}
+			#meridiem {
+				font-size: 70%;
+				padding-left: 10px;
+				flex: 1;
+				text-align: left;
+			}
 		</style>
 		<div id="header" class="hour">
 			<div class="spacer"></div>
 			<div id="hours" class="selected" on-tap="toggleView">{{hours}}</div>
 			<div>:</div>
 			<div id="minutes" on-tap="toggleView">{{minutes}}</div>
-			<div class="spacer"></div>
+			<template is="dom-if" if="{{hour12}}">
+				<div id="meridiem">{{meridiem}}</div>
+			</template>
+			<template is="dom-if" if="{{!hour12}}">
+				<div class="spacer"></div>
+			</template>
 		</div>
 		<div class="box">
 			<div class="container hours"></div>

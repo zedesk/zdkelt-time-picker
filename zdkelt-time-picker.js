@@ -19,6 +19,11 @@ Polymer({
             value: false,
             notify: true
         },
+        meridiem: {
+            type: String,
+            value: "PM",
+            notify: true
+        },
         hours: {
             type: String,
             value: '00'
@@ -31,7 +36,11 @@ Polymer({
     ready: function() {
         var str;
         if (this.hour12) {
-            str = '<zdkelt-clock hour12 id="hourClock"></zdkelt-clock>';
+            if (parseInt(this.hours,10)<12) {
+                str = '<zdkelt-clock hour12 id="hourClock" meridiem="AM"></zdkelt-clock>';
+            } else {
+                str = '<zdkelt-clock hour12 id="hourClock" meridiem="PM"></zdkelt-clock>';
+            }
         } else {
             str = '<zdkelt-clock id="hourClock"></zdkelt-clock>';
         }
@@ -40,6 +49,7 @@ Polymer({
         this._hourClock = this.querySelector('#hourClock');
         this._hourClock.addEventListener('update',this._hourChange.bind(this));
         this._hourClock.addEventListener('change',this._setHours.bind(this));
+        this._hourClock.addEventListener('meridiem-change',this._meridiemChange.bind(this));
         this._minuteClock = this.querySelector('#minuteClock');
         this._minuteClock.addEventListener('update',this._minutesChange.bind(this));
         this._minuteClock.addEventListener('change',this._setMinutes.bind(this));
@@ -77,7 +87,12 @@ Polymer({
         }
         var tmp = newValue.match(/(\d+):(\d+)/);
         if (tmp) {
-            this.set('hours', tmp[1]);
+            if (this.hour12) {
+                this.set('meridiem',parseInt(tmp[1],10) < 12?'AM':'PM');
+                this.set('hours', parseInt(tmp[1],10) % 12);
+            } else {
+                this.set('hours', tmp[1]);
+            }
             this.set('minutes', tmp[2]);
         }
     },
@@ -92,9 +107,27 @@ Polymer({
         this.set('minutes', evt.detail);
         this._value = this.hours + ':' + this.minutes;
     },
+    _meridiemChange: function(evt) {
+        // debugger;
+        this.meridiem = evt.detail;
+        this._setHours();
+    },
     _setHours: function(evt) {
         if (evt) { evt.stopPropagation(); }
-        this.set('value', this.hours + ':' + this.minutes);
+        var value;
+        if (this.hour12) {
+            switch (this.meridiem) {
+                case "AM":
+                    value = (parseInt(this.hours,10) < 10?'0':'')+this.hours + ':' + this.minutes
+                    break;
+                case "PM":
+                    value = (parseInt(this.hours,10)+12) + ':' + this.minutes
+                    break;
+            }
+        } else {
+            value = this.hours + ':' + this.minutes
+        }
+        this.set('value', value);
         this.toggleView();
         this.fire('change',this.value);
     },
