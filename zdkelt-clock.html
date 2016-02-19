@@ -1,358 +1,111 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-styles/paper-styles.html">
-<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 
 <!--
 Internal component that display the hour or minute selector
 
-version : __1.0.0-rc5__
+version : __2.0.0__
+
+This is a complete rewrite of the version 1, that doesn't work on firefox. it's now based on pure HTML and doesn't use SVG.
 
 Example:
 
       <zdkelt-clock minutes id="minuteClock" value="{{minutes}}"
-            on-update="_minutesChange" on-change="_setMinutes"></zdkelt-clock>
+            on-update="_minutesChange" on-change="_setMinutes"></zdkelt-clock2>
 
 ![](hero-clock.png)
 
 @group zdk Elements
-@demo
+@demo demo/zdkelt-clock.html
 -->
 <dom-module id="zdkelt-clock">
 	<template>
-		<style>
-			:host {
-				/* display: block; */
-				position: relative;
-				@apply(--paper-font-body1);
-				-webkit-user-select: none;
-				-moz-user-select: none;
-				-ms-user-select: none;
-				user-select: none;
-			}
-
-			.bg {
-				fill: var(--divider-color);
-				cursor: default;
-			}
-
-			.dot {
-				fill: var(--default-primary-color);
-			}
-
-			.pointer-large {
-				fill: var(--light-primary-color);
-			}
-
-			.pointer-small {
-				fill: var(--default-primary-color);
-			}
-
-			.pointer.visible .pointer-large {
-				fill: var(--default-primary-color);
-			}
-
-			.line {
-				stroke: var(--default-primary-color);
-			}
-
-			.select {
-				fill: white;
-			}
-
-			#clock {
-				height: 100%;
-				width: 100%;
-			}
-
-			#select-area {
-				cursor: pointer;
-				fill: rgba(255, 255, 255, 0.01);
-				fill-opacity: 0;
-			}
-
-			#cursor {
-				display: none;
-			}
-
-			#meridiem {
-				display:none;
-			}
-			#meridiem .select circle {
-				fill: var(--default-primary-color) !important;
-			}
-			#meridiem circle {
-				fill: var(--light-primary-color);
-			}
-			#meridiem.select text {
-				color:white;
-			}
-		</style>
-		<svg version="1.1" viewbox="-100 -100 200 200" id="clock">
-			<g class="face">
-				<circle class="bg" r$="{{_radius}}"></circle>
-				<g id="cursor" class$="{{_getPointerClass(_selectedPoint)}}">
-					<circle class="dot" r="2"></circle>
-					<circle class="pointer-large" r="15" cx$="{{_selectedPoint.x}}" cy$="{{_selectedPoint.y}}"></circle>
-					<circle class="pointer-small" r="5" cx$="{{_selectedPoint.x}}" cy$="{{_selectedPoint.y}}"></circle>
-					<line class="line" x1="0" y1="0" x2$="{{_selectedPoint.x}}" y2$="{{_selectedPoint.y}}"></line>
-				</g>
-			</g>
-			<g id="numbers"></g>
-			<g>
-				<circle id="select-area" r$="{{_radius}}"
-				        on-down="_startSelect"
-				        on-track="_startSelect"
-				        on-up="_finishSelect"></circle>
-			</g>
-			<g id="meridiem">
-				<g id="AM" transform="translate(-30)" on-tap="_toggleMeridiem">
-					<circle r="20" cx="0" cy="0"></circle>
-					<text x="-12" y="5">AM</text>
-				</g>
-				<g id="PM" class="select" transform="translate(30)" on-tap="_toggleMeridiem">
-					<circle r="20" cx="0" cy="0"></circle>
-					<text x="-12" y="5">PM</text>
-				</g>
-			</g>
-		</svg>
-	</template>
-	<script>
-		var SVG_NS = 'http://www.w3.org/2000/svg';
-
-		Polymer({
-			is: 'zdkelt-clock',
-			properties: {
-				/**
-				 * The radius of the clock
-				 */
-				_radius: {
-					type: Number,
-					value: 100
-				},
-				/**
-				 * The selected index in the _numbers array
-				 */
-				_selected: {
-					type: Number,
-					value: 0,
-					notify: true,
-					observer: '_selectedChanged'
-				},
-				/**
-				 * The selected Point
-				 */
-				_selectedPoint: {
-					type: Object,
-					value: null,
-					notify: true
-				},
-				/**
-				 * List of displayed tags
-				 */
-				_numbers: {
-					type: Array,
-					value: []
-				},
-				/**
-				 * The value selected
-				 */
-				value: {
-					type: Number,
-					value: 0,
-					reflectToAttribute: true,
-					notify: true,
-					observer: '_valueChanged'
-				},
-				/**
-				 * Boolean flag indicates to draw minutes clock
-				 */
-				minutes: {
-					type: Boolean,
-					value: false
-				},
-				/**
-				 * Boolean flag indicates to draw our clock with 12 hours
-				 */
-				hour12: {
-					type: Boolean,
-					value: false
-				},
-				meridiem: {
-					type: String,
-					reflectToAttribute: true,
-					notify: true,
-					observer : '_meridiemChange'
-				}
-			},
-			ready: function() {
-				this._populate();
-			},
-			attached: function() {
-				this.refresh();
-			},
-			refresh: function() {
-				var that = this;
-				[].slice.call(this.$.numbers.children).forEach(function(item, i) {
-					item.setAttribute('x', that._numbers[i].x - item.getBBox().width / 2);
-					item.setAttribute('y', that._numbers[i].y + item.getBBox().height / 4);
-				})
-				if (this.hour12) {
-					this.querySelector('#meridiem').style.display = 'block';
-					var item = this.querySelector('#AM text');
-					item.setAttribute('x', -item.getBBox().width / 2);
-					item.setAttribute('y', item.getBBox().height / 4);
-					var item = this.querySelector('#PM text');
-					item.setAttribute('x', -item.getBBox().width / 2);
-					item.setAttribute('y', item.getBBox().height / 4);
-					if (!this.meridiem) this.meridiem = 'PM';
-				}
-			},
-			_valueChanged: function(newValue) {
-				var value;
-				if (!this.minutes) {
-					value = parseInt(this.value, 10) % (this.hour12?12:24);
-				} else {
-					value = parseInt(this.value, 10);
-				}
-				if (newValue !== null) {
-					this.set('_selected', value);
-				}
-			},
-			_selectedChanged: function(newValue, oldValue) {
-				if (this._selected !== null && this.$.numbers.childNodes[this._selected]) {
-					this.set('_selectedPoint', this._numbers[this._selected]);
-					if (oldValue !== undefined && this.$.numbers.childNodes[oldValue]) {
-						this.$.numbers.childNodes[oldValue].classList.remove('select');
-					}
-					this.$.numbers.childNodes[this._selected].classList.toggle('select');
-					this.fire('update', this._numbers[this._selected].label);
-				}
-			},
-			_populate: function() {
-				var i, selected;
-				this._numbers = [];
-				var angleOffset;
-				var angle = Math.PI / 2;
-
-				// remove dom nodes since they'll be re-created
-				while (this.$.numbers.firstChild) {
-					this.$.numbers.removeChild(this.$.numbers.firstChild);
-				}
-				if (this.minutes) {
-					// For minutes circles
-					angleOffset = -360 / 60 * (Math.PI / 180);
-					for (i = 0; i < 60; i++) {
-						this._numbers.push({
-							label: (i < 10 ? '0' : '') + i,
-							value: i,
-							x: 85 * Math.cos(angle + angleOffset * i),
-							y: -85 * Math.sin(angle + angleOffset * i),
-							display: (i % 5 === 0) ? true : false
-						});
-					}
-				} else {
-					angleOffset = -360 / 12 * (Math.PI / 180);
-					for (i = 0; i < 12; i++) {
-						this._numbers.push({
-							label: (this.hour12 && i == 0) ? '12' : ((!this.hour12 && i < 10)?'0':'') + i,
-							value: i,
-							x: 85 * Math.cos(angle + angleOffset * i),
-							y: -85 * Math.sin(angle + angleOffset * i),
-							display: true
-						});
-					}
-					if (!this.hour12) {
-						for (i = 0; i < 12; i++) {
-							this._numbers.push({
-								label: i + 12 + '',
-								value: i + 12,
-								x: 55 * Math.cos(angle + angleOffset * i),
-								y: -55 * Math.sin(angle + angleOffset * i),
-								display: true
-							});
-						}
-					}
-				}
-
-				var gNumbers = this.$.numbers;
-				this._numbers.forEach(function(number, indx) {
-					var point = document.createElementNS(SVG_NS, 'text');
-					point.textContent = number.display ? number.label : '';
-					if (this.value && number.label === this.value) {
-						selected = indx;
-					}
-					Polymer.dom(gNumbers).appendChild(point);
-				});
-				if (this.meridiem === 'AM') {
-					this.$.numbers.firstChild.innerHTML = '0';
-				}
-				this._selectedChanged(selected);
-			},
-			_getPointerClass: function(obj) {
-				if (obj) {
-					this.$.cursor.style.display = 'block';
-				}
-				return 'pointer' + (obj && obj.display ? ' visible' : '');
-			},
-			_startSelect: function(evt) {
-				if (evt.type === 'down') {
-					this._evt = 'down';
-				}
-				if (this._evt !== 'down') {
-					return;
-				}
-				var angleOffset = -360 / (this.minutes ? 60 : 12) * (Math.PI / 180);
-				var _rect = this.getBoundingClientRect();
-
-				var x = ((evt.detail.x - _rect.left) - _rect.width / 2) / _rect.width;
-				var y = (evt.detail.y - _rect.top + _rect.width / 2) / _rect.width;
-				// coordonnées in SVG space
-				var tmp = {
-					x: x * 200,
-					y: y * 200
-				};
-				var radius = Math.sqrt(tmp.x * tmp.x + tmp.y * tmp.y);
-				if (radius < 40) {
-					return;
-				}
-				// recherche le point le plus proche
-				var theta = Math.atan(tmp.y / tmp.x);
-				theta = (Math.PI / 2) + (tmp.x < 0 ? theta + Math.PI : theta);
-				var indx = Math.round(-theta / angleOffset);
-				if (!this.minutes) {
-					indx = indx > 11 ? 0 : indx;
-					if (!this.hour12) {
-						indx += radius > 70 ? 0 : 12;
-					}
-				} else {
-					indx = indx > 59 ? 0 : indx;
-				}
-				if (this._selected !== indx) {
-					this._selected = indx;
-				}
-			},
-			_finishSelect: function() {
-				this._evt = null;
-				this.value = this._numbers[this._selected].label;
-				this.fire('change', this.value);
-			},
-			_meridiemChange: function(newValue) {
-				if (this.querySelector('#meridiem .select').id !== newValue) {
-					this._toggleMeridiem();
-				}
-			},
-			_toggleMeridiem: function() {
-				var item = this.$.numbers.firstChild;
-				this.querySelector('#AM').classList.toggle('select');
-				this.querySelector('#PM').classList.toggle('select');
-				this.meridiem = this.querySelector('#AM').classList.contains('select')?'AM':'PM';
-				if (item) {
-					item.innerHTML = this.meridiem === 'AM'?'0':'12';
-					item.setAttribute('x', this._numbers[0].x - item.getBBox().width / 2);
-					item.setAttribute('y', this._numbers[0].y + item.getBBox().height / 4);
-				}
-				this.fire('meridiem-change', this.meridiem);
-			}
-		});
-	</script>
+        <style is="custom-style">
+        #clock {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            background: var(--divider-color);
+            border-radius: 50%;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            cursor: pointer;
+        }
+        .tick {
+            position: absolute;
+            font-family: Roboto, verdana;
+            font-size: 14px;
+            text-align: center;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            margin-top: -12px;
+            margin-left: -12px;
+        }
+        #selector {
+            position: absolute;
+            top: 100px;
+            left: 100px;
+            transform: rotate(180deg);
+            transform-origin: top left;
+        }
+        .central-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--default-primary-color);
+            margin-top: -3px;
+            margin-left: -3px;
+        }
+        .line {
+            height: 82px;
+            width: 2px;
+            background: var(--default-primary-color);
+            margin-left: -1px;
+        }
+        .sline {
+            height: 52px !important;
+        }
+        .large-dot {
+            position: relative;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--default-primary-color);
+            margin-top: -15px;
+            margin-left: -15px;
+        }
+        .dot {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--default-primary-color);
+            margin-top: -5px;
+            margin-left: -5px;
+            top: 15px;
+            left: 15px;
+        }
+        .ldot-minutes {
+            background: var(--light-primary-color);
+        }
+        .select {
+            color: white;
+        }
+        </style>
+        <div id="clock" on-down="_startSelect"
+             on-track="_dragSelect"
+             on-up="_finishSelect">
+            <div id="selector">
+                <div class="central-dot"></div>
+                <div class="line"></div>
+                <div class="large-dot">
+                    <div class="dot"></div>
+                </div>
+            </div>
+            <div id="ticks"></div>
+        </div>
+    </template>
+    <script src="zdkelt-clock.js"></script>
 </dom-module>
