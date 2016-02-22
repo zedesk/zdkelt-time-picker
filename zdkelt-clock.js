@@ -50,13 +50,13 @@ Polymer({
 
     ready:function() {
         this._radius = this.$.clock.offsetWidth / 2 - 15;
-        this._viewChanged();
+        // this._viewChanged();
     },
 
-    // attached: function() {
-    //     this._radius = this.$.clock.offsetWidth / 2 - 15;
-    //     this._viewChanged();
-    // },
+    attached: function() {
+         this._radius = this.$.clock.offsetWidth / 2 - 15;
+         this._viewChanged();
+    },
 
     /**
      * change the view function of the `minutes` property
@@ -87,7 +87,7 @@ Polymer({
                 length: 12
             })
             .map(Number.call, Number)
-            .map((tickLabel, indx) => {
+            .map( function(tickLabel, indx) {
                 var tick = document.createElement('div');
                 tick.classList.add('tick');
                 tick.innerHTML = tickLabel;
@@ -99,7 +99,7 @@ Polymer({
 
                 var x = radius * Math.cos(angle + angleOffset * indx) + radiusTot;
                 var y = -radius * Math.sin(angle + angleOffset * indx) + radiusTot;
-                var transform = `translate(${x}px,${y}px)`;
+                var transform = 'translate('+x+'px,'+y+'px)';
                 tick.style.transform = transform;
             });
         this.$.selector.style.transform = 'rotate(180deg)';
@@ -117,7 +117,7 @@ Polymer({
                 length: 12
             })
             .map(Number.call, Number)
-            .map((tickLabel, indx) => {
+            .map(function(tickLabel, indx) {
                 var tick = document.createElement('div');
                 tick.classList.add('tick');
                 tick.innerHTML = tickLabel + 12;
@@ -125,7 +125,7 @@ Polymer({
                 Polymer.dom(ticks).appendChild(tick);
                 var x = (radius - 30) * Math.cos(angle + angleOffset * indx) + radiusTot;
                 var y = -(radius - 30) * Math.sin(angle + angleOffset * indx) + radiusTot;
-                var transform = `translate(${x}px,${y}px)`;
+                var transform = 'translate('+x+'px,'+y+'px)';
                 tick.style.transform = transform;
             });
     },
@@ -141,7 +141,7 @@ Polymer({
                 length: 60
             })
             .map(Number.call, Number)
-            .map((tickLabel, indx) => {
+            .map(function(tickLabel, indx) {
                 var tick = document.createElement('div');
                 tick.classList.add('tick');
                 if (indx % 5 === 0) {
@@ -154,7 +154,7 @@ Polymer({
                 Polymer.dom(ticks).appendChild(tick);
                 var x = radius * Math.cos(angle + angleOffset * indx) + radiusTot;
                 var y = -radius * Math.sin(angle + angleOffset * indx) + radiusTot;
-                var transform = `translate(${x}px,${y}px)`;
+                var transform = 'translate('+x+'px,'+y+'px)';
                 tick.style.transform = transform;
             });
         var line = document.querySelector('.line');
@@ -188,7 +188,7 @@ Polymer({
         ticks[this.value].classList.toggle('select');
         var angleOffset = this.minutes ? 6 : 30;
         var theta = (this.value + (this.minutes ? 30 : 6)) * angleOffset;
-        var transform = `rotate(${theta}deg)`;
+        var transform = 'rotate('+theta+'deg)';
         this.$.selector.style.transform = transform;
         if (this.minutes) {
             var classList = this.$.clock.querySelector('.large-dot').classList;
