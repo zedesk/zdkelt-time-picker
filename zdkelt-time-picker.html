@@ -6,13 +6,21 @@
 <!--
 A time picker component
 
-version : __1.0.0-rc5__
+version : __2.0.0__
+
+A time picker component 'à la' material design
+
+This is a complete rewrite of the version 1, that doesn't work on firefox.
+
+> __Warning__ component does not yet support the meridiem hours, and is based only on 24-hour clock.
 
 Example:
 
     <zdkelt-time-picker value="17:00"></zdkelt-time-picker>
 
 ![](hero-timer.png)
+
+> __Warning__ component does not yet support the meridiem hours, and is based only on 24-hour clock.
 
 @group zdk Elements
 @demo
@@ -24,16 +32,16 @@ Example:
 				position: relative;
 				display: block;
 				box-sizing: border-box;
-				width: 250px;
-				height: 300px;
+				width: 220px;
+				height: 270px;
 				overflow: hidden;
 				@apply(--layout-vertical);
 				@apply(--paper-font-body1);
 			}
 
 			.box {
-				height: 250px;
-				overflow: hidden
+				@apply(--layout-vertical);
+				@apply(--layout-flex);
 			}
 
 			.hour {
@@ -55,13 +63,15 @@ Example:
 				height: 230px;
 				margin: 10px;
 			}
+
 			div.spacer {
 				@apply(--layout-flex);
 			}
+
 			zdkelt-clock {
-				position: relative;
-				width: 100%;
+				margin: 10px;
 			}
+
 			#meridiem {
 				font-size: 70%;
 				padding-left: 10px;
@@ -82,8 +92,9 @@ Example:
 			</template>
 		</div>
 		<div class="box">
-			<div class="container hours"></div>
-			<div class="container minutes"></div>
+			<zdkelt-clock id="clock" value="{{_value}}"
+			               on-change="_clockChange"
+			               on-update="_clockUpdate"></zdkelt-clock>
 		</div>
 	</template>
 	<script src="zdkelt-time-picker.js"></script>
