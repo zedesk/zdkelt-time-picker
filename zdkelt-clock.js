@@ -187,8 +187,8 @@ Polymer({
 		var transform = 'rotate(' + theta + 'deg)';
 		this.$.selector.style.transform = transform;
 		var line = this.$.clock.querySelector('.line');
+		var classList = this.$.clock.querySelector('.large-dot').classList;
 		if (this.minutes) {
-			var classList = this.$.clock.querySelector('.large-dot').classList;
 			line.classList.remove('sline');
 			if (this.value % 5 === 0) {
 				classList.remove('ldot-minutes');
@@ -198,6 +198,7 @@ Polymer({
 				}
 			}
 		} else {
+			classList.remove('ldot-minutes');
 			var line = this.$.clock.querySelector('.line');
 			if (this.value >= 12) {
 				if (!line.classList.contains('sline')) {
