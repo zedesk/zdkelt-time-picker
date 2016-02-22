@@ -30,6 +30,8 @@ Polymer({
 		},
 		/**
 		 * the meridiem value : 'AM'|'PM'
+		 * 
+		 * __Nota :__ not yet implemented
 		 */
 		meridiem: {
 			type              : String,
@@ -42,6 +44,9 @@ Polymer({
 		_radius : {
 			type: Number
 		},
+		/**
+		 * internal flag indicating when the mouse is down
+		 */
 		_down   : {
 			type : Boolean,
 			value: false
@@ -75,6 +80,9 @@ Polymer({
 		}
 	},
 
+	/**
+	 * Draw the the hour clock ( 0 to 11 )
+	 */
 	_hour12draw: function () {
 		var ticks = this.$.ticks;
 		var angleOffset = -360 / 12 * (Math.PI / 180);
@@ -103,6 +111,9 @@ Polymer({
 			});
 	},
 
+	/**
+	 * Draw the the hour clock ( 12 to 23 )
+	 */
 	_hour24draw: function () {
 		var angleOffset = -360 / 12 * (Math.PI / 180);
 		var angle = Math.PI / 2;
@@ -127,6 +138,9 @@ Polymer({
 			});
 	},
 
+	/**
+	 * Draw the minutes clock
+	 */
 	_minutedraw: function () {
 		var angleOffset = -360 / 60 * (Math.PI / 180);
 		var angle = Math.PI / 2;
@@ -160,6 +174,10 @@ Polymer({
 		}
 	},
 
+	/**
+	 * an `update` event is emitted when the value change by dragging the mouse
+	 * @event update
+	 */
 	_valueChanged: function () {
 		var ticks = [].slice.call(this.$.ticks.querySelectorAll('.tick'));
 		if (!ticks.length) {
@@ -176,6 +194,9 @@ Polymer({
 		this.fire('update', this.value);
 	},
 
+	/**
+	 * Draw the selector
+	 */
 	_selectorPos: function () {
 		if (isNaN(this.value)) {
 			return;
@@ -211,7 +232,7 @@ Polymer({
 			}
 		}
 	},
-
+	
 	_startSelect: function (evt) {
 		this._down = true;
 		this._dragSelect(evt);
@@ -255,6 +276,11 @@ Polymer({
 		this.value = indx + (this.minutes ? 0 : (coord.r > this._radius - 20) ? 0 : 12);
 	},
 
+	/**
+	 * an `change` event is emitted when the mouse is released
+	 * 
+	 * @event change
+	 */
 	_finishSelect: function () {
 		this._down = false;
 		this.fire('change', this.value);
