@@ -1,145 +1,138 @@
-'use strict';
-
 Polymer({
-    is: 'zdkelt-time-picker',
-    properties: {
-        value: {
-            type: String,
-            value: '',
-            reflectToAttribute: true,
-            notify: true,
-            observer: '_valueChanged'
-        },
-        view: {
-            type: String,
-            value: 'hours'
-        },
-        hour12: {
-            type: Boolean,
-            value: false,
-            notify: true
-        },
-        meridiem: {
-            type: String,
-            value: "PM",
-            notify: true
-        },
-        hours: {
-            type: String,
-            value: '00'
-        },
-        minutes: {
-            type: String,
-            value: '00'
-        }
-    },
-    ready: function() {
-        var str;
-        if (this.hour12) {
-            if (parseInt(this.hours,10)<12) {
-                str = '<zdkelt-clock hour12 id="hourClock" meridiem="AM"></zdkelt-clock>';
-            } else {
-                str = '<zdkelt-clock hour12 id="hourClock" meridiem="PM"></zdkelt-clock>';
-            }
-        } else {
-            str = '<zdkelt-clock id="hourClock"></zdkelt-clock>';
-        }
-        this.querySelector('.hours').innerHTML = str;
-        this.querySelector('.minutes').innerHTML = '<zdkelt-clock minutes id="minuteClock" ></zdkelt-clock>';
-        this._hourClock = this.querySelector('#hourClock');
-        this._hourClock.addEventListener('update',this._hourChange.bind(this));
-        this._hourClock.addEventListener('change',this._setHours.bind(this));
-        this._hourClock.addEventListener('meridiem-change',this._meridiemChange.bind(this));
-        this._minuteClock = this.querySelector('#minuteClock');
-        this._minuteClock.addEventListener('update',this._minutesChange.bind(this));
-        this._minuteClock.addEventListener('change',this._setMinutes.bind(this));
-    },
-    attached: function() {
-        this.refresh();
-    },
-    refresh: function() {
-        // ensure on firefox that the hour view is selected
-        this.querySelector('.box').scrollTop = 0;
-        this._valueChanged(this.value);
-        this._hourClock.value = this.hours;
-        this._minuteClock.value = this.minutes;
-        this._hourClock.refresh();
-        this._minuteClock.refresh();
-    },
-    setView: function(view) {
-        this.$.hours.classList.remove('selected');
-        this.$.minutes.classList.remove('selected');
-        switch(view) {
-            case "hours":
-                this.$.hours.classList.toggle('selected');
-                this.querySelector('.box').scrollTop = 0;
-                break;
-            case "minutes":
-                this.$.minutes.classList.toggle('selected');
-                this.querySelector('.box').scrollTop = 240;
-                break;
-        }
-    },
-    _toggleView: function(evt) {
-        var select = this.$.header.querySelector('.selected');
-        if (evt && evt.target === select) { return; }
-        var view = select.id === 'hours'?'minutes':'hours';
-        this.setView(view);
-    },
-    _valueChanged: function(newValue) {
-        if (!newValue) {
-            this.value = this.hours + ':' + this.minutes;
-            return;
-        }
-        var tmp = newValue.match(/(\d+):(\d+)/);
-        if (tmp) {
-            if (this.hour12) {
-                this.set('meridiem',parseInt(tmp[1],10) < 12?'AM':'PM');
-                this.set('hours', parseInt(tmp[1],10) % 12);
-            } else {
-                this.set('hours', tmp[1]);
-            }
-            this.set('minutes', tmp[2]);
-        }
-    },
-    _hourChange: function(evt) {
-        if (this.$.header.querySelector('.selected').id !== 'hours') {
-            return;
-        }
-        this.set('hours', evt.detail);
-        this._value = this.hours + ':' + this.minutes;
-    },
-    _minutesChange: function(evt) {
-        this.set('minutes', evt.detail);
-        this._value = this.hours + ':' + this.minutes;
-    },
-    _meridiemChange: function(evt) {
-        // debugger;
-        this.meridiem = evt.detail;
-        this._setHours();
-    },
-    _setHours: function(evt) {
-        if (evt) { evt.stopPropagation(); }
-        var value;
-        if (this.hour12) {
-            switch (this.meridiem) {
-                case "AM":
-                    value = (parseInt(this.hours,10) < 10?'0':'')+this.hours + ':' + this.minutes
-                    break;
-                case "PM":
-                    value = (parseInt(this.hours,10)+12) + ':' + this.minutes
-                    break;
-            }
-        } else {
-            value = this.hours + ':' + this.minutes
-        }
-        this.set('value', value);
-        this._toggleView();
-        this.fire('change',this.value);
-    },
-    _setMinutes: function(evt) {
-        if (evt) { evt.stopPropagation(); }
-        this.set('value', this.hours + ':' + this.minutes);
-        this.fire('change',this.value);
-    }
+	is        : 'zdkelt-time-picker',
+	properties: {
+		/**
+		 * The value formated as 'HH:MM'
+		 *
+		 * The time is given in 24-hours time
+		 */
+		value  : {
+			type              : String,
+			value             : '00:00',
+			reflectToAttribute: true,
+			notify            : true,
+			observer          : '_valueChanged'
+		},
+		/**
+		 * Define the view
+		 *
+		 * available value are `hours` (default) or `minutes`
+		 */
+		view   : {
+			type    : String,
+			value   : 'hours',
+			observer: '_setView'
+		},
+		/**
+		 * not yet implemented
+		 * Boolean flag indicates to draw our clock with 12 hours
+		 */
+		hour12 : {
+			type  : Boolean,
+			value : false,
+			notify: true
+		},
+		/**
+		 * The hours value
+		 */
+		hours  : {
+			type : String,
+			value: '00'
+		},
+		/**
+		 * The minutes value
+		 */
+		minutes: {
+			type : String,
+			value: '00'
+		}
+	},
+
+	attached: function () {
+		this.refresh();
+	},
+
+	/**
+	 * Force the redraw of the clock
+	 */
+	refresh: function () {
+		this.view = 'minutes';
+		setTimeout((function () {
+			this.view = 'hours';
+		}).bind(this), 0);
+	},
+
+	/**
+	 * set the view, depending of the `view`property
+	 */
+	_setView: function () {
+		this.$.hours.classList.remove('selected');
+		this.$.minutes.classList.remove('selected');
+		switch (this.view) {
+			case 'hours':
+				this.$.hours.classList.toggle('selected');
+				this.$.clock.minutes = false;
+				this.$.clock.value = parseInt(this.hours, 10);
+				break;
+			case 'minutes':
+				this.$.minutes.classList.toggle('selected');
+				this.$.clock.minutes = true;
+				this.$.clock.value = parseInt(this.minutes, 10);
+				break;
+		}
+	},
+
+	/**
+	 * toggle the view
+	 */
+	_toggleView: function (evt) {
+		var select = this.$.header.querySelector('.selected');
+		if (evt && evt.target === select) {
+			return;
+		}
+		this.view = select.id === 'hours' ? 'minutes' : 'hours';
+	},
+
+	_valueChanged: function (newValue) {
+		if (!newValue) {
+			this.value = this.hours + ':' + this.minutes;
+			return;
+		}
+		var tmp = newValue.match(/(\d+):(\d+)/);
+		if (tmp) {
+			this.set('hours', tmp[1]);
+			this.set('minutes', tmp[2]);
+			if (this.$.clock.minutes) {
+				this.$.clock.value = parseInt(tmp[2], 10);
+			} else {
+				this.$.clock.value = parseInt(tmp[1], 10);
+			}
+		}
+	},
+
+	/**
+	 * intercept the `change`event of the zdkelt-clock component.
+	 *
+	 * if the the view was the `hours` view, it's then automatically changed
+	 * to the `minutes` view.
+	 */
+	_clockChange: function (evt) {
+		evt.stopPropagation();
+		if (this.view === 'hours') {
+			this._toggleView();
+		}
+	},
+
+	/**
+	 * The `update` event is emitted when the mouse is dragged
+	 *
+	 * @event update
+	 */
+	_clockUpdate: function (evt) {
+		evt.stopPropagation();
+		var tmp = parseInt(evt.detail, 10);
+		this.set(this.view, (tmp < 10 ? '0' : '') + tmp);
+		this.value = this.hours + ':' + this.minutes;
+		this.fire('update', this.value);
+	}
 });
