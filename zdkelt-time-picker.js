@@ -28,15 +28,15 @@ Polymer({
         }
     },
 
-    ready: function() {
+    attached: function() {
         this.refresh();
     },
 
     refresh: function() {
         this.view = 'minutes';
-        setTimeout(() => {
+        setTimeout((function() {
             this.view = 'hours';
-        }, 0);
+        }).bind(this), 0);
     },
 
     _setView: function() {
@@ -73,7 +73,11 @@ Polymer({
         if (tmp) {
             this.set('hours', tmp[1]);
             this.set('minutes', tmp[2]);
-            this.refresh();
+            if(this.$.clock.minutes) {
+                this.$.clock.value = parseInt(tmp[2],10);
+            } else {
+                this.$.clock.value = parseInt(tmp[1],10);
+            }
         }
     },
 
