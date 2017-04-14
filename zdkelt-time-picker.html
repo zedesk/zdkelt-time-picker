@@ -1,7 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-styles/paper-styles.html">
-<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="zdkelt-clock.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="./zdkelt-clock.html">
 
 <!--
 A time picker component
@@ -46,11 +46,11 @@ Example:
 
 			.hour {
 				font-size: 40px !important;
-				text-align: center;
-				line-height: 50px !important;
 				height: 50px;
-				background: var(--default-primary-color);
+				background: var(--zdkelt-time-color, --primary-color);
 				color: lightgray;
+				justify-content: center;
+    		align-items: center;
 				@apply(--layout-horizontal);
 			}
 
@@ -75,27 +75,24 @@ Example:
 			#meridiem {
 				font-size: 70%;
 				padding-left: 10px;
-				flex: 1;
+				/* flex: 1; */
 				text-align: left;
 			}
 		</style>
 		<div id="header" class="hour">
-			<div class="spacer"></div>
 			<div id="hours" class="selected" on-tap="_toggleView">{{hours}}</div>
 			<div>:</div>
 			<div id="minutes" on-tap="_toggleView">{{minutes}}</div>
+
 			<template is="dom-if" if="{{hour12}}">
 				<div id="meridiem">{{meridiem}}</div>
 			</template>
-			<template is="dom-if" if="{{!hour12}}">
-				<div class="spacer"></div>
-			</template>
-		</div>
-		<div class="box">
-			<zdkelt-clock id="clock" value="{{_value}}"
-			               on-change="_clockChange"
-			               on-update="_clockUpdate"></zdkelt-clock>
-		</div>
+
+	</div>
+	<div class="box">
+		<zdkelt-clock id="clock" hour12="{{hour12}}" value="{{_value}}" on-change="_clockChange" on-update="_clockUpdate"></zdkelt-clock>
+	</div>
 	</template>
-	<script src="zdkelt-time-picker.js"></script>
+
+	<script src="zdkelt-time-picker.js "></script>
 </dom-module>

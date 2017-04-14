@@ -11,14 +11,10 @@
 </head>
 
 <body>
-  <zdkelt-clock id="clock1" value="16"></zdkelt-clock>
+  <zdkelt-clock id="clock1" hour12 value="16"></zdkelt-clock>
   <div>Update detail : <span class="clock1Update"></span></div>
   <div>Change detail : <span class="clock1Change"></span></div>
-  <zdkelt-clock id="clock2" minutes value="22"></zdkelt-clock>
-  <div>Update detail : <span class="clock2Update"></span></div>
-  <div>Change detail : <span class="clock2Change"></span></div>
 
-  <zdkelt-clock id="clock3" hour12 value="16"></zdkelt-clock>
   <script>
     (function() {
       var clock1 = document.querySelector('#clock1');
@@ -28,16 +24,6 @@
       }, false);
       clock1.addEventListener('change', function(evt) {
         var div = document.querySelector('.clock1Change');
-        div.innerHTML = evt.detail;
-      }, false);
-
-      var clock2 = document.querySelector('#clock2');
-      clock2.addEventListener('update', function(evt) {
-        var div = document.querySelector('.clock2Update');
-        div.innerHTML = evt.detail;
-      }, false);
-      clock2.addEventListener('change', function(evt) {
-        var div = document.querySelector('.clock2Change');
         div.innerHTML = evt.detail;
       }, false);
     })();

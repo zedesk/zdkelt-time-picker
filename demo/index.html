@@ -10,23 +10,31 @@
 </head>
 
 <body>
-<style>
-	zdkelt-time-picker {
-		border: 1px solid lightgray;
-	}
-</style>
-<zdkelt-time-picker id="clock1" value="16:25"></zdkelt-time-picker>
-<div>Update : <span class="update"></span></div>
-<script>
-	'use strict';
-	( function() {
-		var clock = document.querySelector('#clock1');
-		clock.addEventListener('update', (evt) => {
+	<style is="custom-style">
+		:root {
+			--light-primary-color: firebrick;
+			--divider-color: navy;
+		}
+
+		zdkelt-time-picker {
+			border: 1px solid lightgray;
+			--zdkelt-time-background: rgb(142, 152, 137);
+			--zdkelt-time-color: teal;
+			--zdkelt-time-lightcolor: rgba(0, 128, 128, 0.3);
+		}
+	</style>
+	<zdkelt-time-picker id="clock1" value="16:25"></zdkelt-time-picker>
+	<div>Update : <span class="update"></span></div>
+	<zdkelt-time-picker id="clock2" value="16:25" hour12></zdkelt-time-picker>
+	<script>
+		'use strict';
+		(function() {
+			var clock = document.querySelector('#clock1');
+			clock.addEventListener('update', (evt) => {
 				document.querySelector('.update').innerHTML = evt.detail;
-			}
-		,false);
-	})()
-</script>
+			}, false);
+		})()
+	</script>
 </body>
 
 </html>
