@@ -1,43 +1,54 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>zdkelt-clock test</title>
-        <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-	    <link rel="import" href="../../paper-styles/paper-styles.html">
-        <link rel="import" href="../zdkelt-clock.html">
-    </head>
-    <body>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>zdkelt-clock demo</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../zdkelt-clock.html">
+</head>
+
+<body>
+  <div class="vertical-section-container centered">
+    <demo-snippet>
+      <template>
         <zdkelt-clock id="clock1" value="16"></zdkelt-clock>
         <div>Update detail : <span class="clock1Update"></span></div>
         <div>Change detail : <span class="clock1Change"></span></div>
         <zdkelt-clock id="clock2" minutes value="22"></zdkelt-clock>
         <div>Update detail : <span class="clock2Update"></span></div>
         <div>Change detail : <span class="clock2Change"></span></div>
-
         <script>
-        (function () {
-            var clock1 = document.querySelector('#clock1');
-            clock1.addEventListener('update', function(evt) {
-                var div = document.querySelector('.clock1Update');
-                div.innerHTML = evt.detail;
-            }, false);
-            clock1.addEventListener('change', function(evt) {
-                var div = document.querySelector('.clock1Change');
-                div.innerHTML = evt.detail;
-            }, false);
-
-            var clock2 = document.querySelector('#clock2');
-            clock2.addEventListener('update', function(evt) {
-                var div = document.querySelector('.clock2Update');
-                div.innerHTML = evt.detail;
-            }, false);
-            clock2.addEventListener('change', function(evt) {
-                var div = document.querySelector('.clock2Change');
-                div.innerHTML = evt.detail;
-            }, false);
-        })();
+          window.addEventListener('WebComponentsReady', () => {
+            var clock1 = document.querySelector('#clock1')
+            clock1.addEventListener('update', function (evt) {
+              var div = document.querySelector('.clock1Update')
+              div.innerHTML = evt.detail
+            }, false)
+            clock1.addEventListener('change', function (evt) {
+              var div = document.querySelector('.clock1Change')
+              div.innerHTML = evt.detail
+            }, false)
+          
+            var clock2 = document.querySelector('#clock2')
+            clock2.addEventListener('update', function (evt) {
+              var div = document.querySelector('.clock2Update')
+              div.innerHTML = evt.detail
+            }, false)
+            clock2.addEventListener('change', function (evt) {
+              var div = document.querySelector('.clock2Change')
+              div.innerHTML = evt.detail
+            }, false)
+          })
         </script>
-    </body>
+      </template>
+    </demo-snippet>
+  </div>
+</body>
+
 </html>
