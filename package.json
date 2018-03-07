@@ -4,18 +4,20 @@
   "description": "A time picker webcomponent",
   "main": "zdk-time-picker.html",
   "scripts": {
-    "test": "wct",
-    "clean": "rm -rf bower-components",
+    "test": "polymer test",
+    "clean": "rm -rf bower_components",
     "postinstall": "bower install",
-    "start": "polyserve"
+    "start": "polymer serve -H 0.0.0.0",
+    "lint:javascript": "eslint . --ext js,html --ignore-path .gitignore",
+    "lint:polymer": "polymer lint",
+    "lint": "npm run lint:polymer && npm run lint:javascript",
+    "doc": "polymer analyze > analysis.json"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zedesk/zdkelt-time-picker.git"
   },
-  "author": [
-    "zeDesk <dev@zedesk.net>"
-  ],
+  "author": "zeDesk <dev@zedesk.net>",
   "license": "https://github.com/zedesk/zdkElt-time-picker/LICENCE",
   "keywords": [
     "web-component",
@@ -36,11 +38,14 @@
   },
   "homepage": "https://github.com/zedesk/zdkelt-time-picker#readme",
   "devDependencies": {
-    "bower": "^1.7.7",
-    "jscs": "^2.9.0",
-    "polybuild": "^1.1.0",
-    "polylint": "^2.9.0",
-    "polyserve": "^0.6.0",
-    "vulcanize": "^1.14.5"
+    "bower": "^1.8.2",
+    "eslint": "^4.18.2",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-html": "^4.0.2",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "polymer-cli": "^1.6.0"
   }
 }
