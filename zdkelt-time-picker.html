@@ -82,19 +82,16 @@ Example:
 
     </style>
     <div id="header" class="hour">
-      <div class="spacer"></div>
-      <div id="hours" class="selected" on-tap="_toggleView">{{hours}}</div>
+      <div id="hour" class="selected" on-tap="_toggleView">{{hours}}</div>
       <div>:</div>
-      <div id="minutes" on-tap="_toggleView">{{minutes}}</div>
+      <div id="minute" on-tap="_toggleView">{{minutes}}</div>
       <template is="dom-if" if="{{hour12}}">
         <div id="meridiem">{{meridiem}}</div>
       </template>
-      <template is="dom-if" if="{{!hour12}}">
-        <div class="spacer"></div>
-      </template>
   </div>
   <div class="box">
-    <zdkelt-clock id="clock" value="{{_value}}" on-change="_clockChange" on-update="_clockUpdate"></zdkelt-clock>
+      <zdkelt-clock id="hours" value="{{_hours}}" on-change="_dispatchChange" on-update="_hoursUpdate"></zdkelt-clock>
+      <zdkelt-clock id="minutes" minutes value="{{_minutes}}" on-change="_dispatchChange" on-update="_minutesUpdate"></zdkelt-clock>
   </div>
   </template>
   <script>
@@ -123,7 +120,7 @@ Example:
            */
           view: {
             type: String,
-            value: 'hours',
+            value: 'hour',
             observer: '_setView',
           },
           /**
@@ -149,21 +146,29 @@ Example:
             type: String,
             value: '00',
           },
+
+          _hours: {
+            type: Number,
+            value: 0,
+          },
         }
       }
 
       connectedCallback() {
         super.connectedCallback()
-        this.refresh()
+        // this.refresh()
+        Polymer.RenderStatus.afterNextRender(this, () => {
+          this.$.minutes.hidden = true
+        })
       }
 
       /**
        * Force the redraw of the clock
        */
       refresh() {
-        this.view = 'minutes'
+        this.view = 'minute'
         setTimeout(() => {
-          this.view = 'hours'
+          this.view = 'hour'
         }, 0)
       }
 
@@ -171,18 +176,20 @@ Example:
        * set the view, depending of the `view`property
        */
       _setView() {
-        this.$.hours.classList.remove('selected')
-        this.$.minutes.classList.remove('selected')
+        this.$.hour.classList.remove('selected')
+        this.$.minute.classList.remove('selected')
         switch (this.view) {
-          case 'hours':
-            this.$.hours.classList.toggle('selected')
-            this.$.clock.minutes = false
-            this.$.clock.value = parseInt(this.hours, 10)
+          case 'hour':
+            this.$.hour.classList.toggle('selected')
+            this.$.hours.value = parseInt(this.hours, 10)
+            this.$.hours.hidden = false
+            this.$.minutes.hidden = true
             break
-          case 'minutes':
-            this.$.minutes.classList.toggle('selected')
-            this.$.clock.minutes = true
-            this.$.clock.value = parseInt(this.minutes, 10)
+          case 'minute':
+            this.$.minute.classList.toggle('selected')
+            this.$.minutes.value = parseInt(this.minutes, 10)
+            this.$.hours.hidden = true
+            this.$.minutes.hidden = false
             break
         }
       }
@@ -195,54 +202,36 @@ Example:
         if (evt && evt.target === select) {
           return
         }
-        this.view = select.id === 'hours' ? 'minutes' : 'hours'
+        this.view = select.id === 'hour' ? 'minute' : 'hour'
       }
 
-      _valueChanged(newValue) {
+      _valueChanged(newValue, oldValue) {
+        if (newValue === oldValue) return
         if (!newValue) {
           this.value = this.hours + ':' + this.minutes
           return
         }
         var tmp = newValue.match(/(\d+):(\d+)/)
         if (tmp) {
-          this.set('hours', tmp[1])
-          this.set('minutes', tmp[2])
-          if (this.$.clock.minutes) {
-            this.$.clock.value = parseInt(tmp[2], 10)
-          } else {
-            this.$.clock.value = parseInt(tmp[1], 10)
-          }
+          this.hours = tmp[1]
+          this.minutes = tmp[2]
+          this.$.hours.value = parseInt(tmp[1], 10)
+          this.$.minutes.value = parseInt(tmp[2], 10)
         }
       }
 
-      /**
-       * intercept the `change`event of the zdkelt-clock component.
-       *
-       * if the the view was the `hours` view, it's then automatically changed
-       * to the `minutes` view.
-       */
-      _clockChange(evt) {
-        console.log('clock change')
-        evt.stopPropagation()
-        if (this.view === 'hours') {
-          debugger
-          this._toggleView()
-        }
-        this.dispatchEvent(new CustomEvent('change', {detail: this.value}))
+      _hoursUpdate(evt) {
+        this.hours = (evt.detail + '').padStart(2, '0')
       }
 
-      /**
-       * The `update` event is emitted when the mouse is dragged
-       *
-       * @event update
-       */
-      _clockUpdate(evt) {
-        console.log('clock update')
-        evt.stopPropagation()
-        var tmp = parseInt(evt.detail, 10)
-        this.set(this.view, (tmp < 10 ? '0' : '') + tmp)
+      _minutesUpdate(evt) {
+        this.minutes = (evt.detail + '').padStart(2, '0')
+      }
+
+      _dispatchChange() {
         this.value = this.hours + ':' + this.minutes
-        this.dispatchEvent(new CustomEvent('update', {detail: this.value}))
+        this.dispatchEvent(new CustomEvent('change', {detail: this.value}))
+        this.view = this.view === 'hour' ? 'minute' : 'hour'
       }
     }
 
