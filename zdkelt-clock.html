@@ -214,7 +214,7 @@ The component has been tested on :
         var radius = this._radius
         var radiusTot = this.$.clock.offsetWidth / 2
 
-        ;[...Array(12).keys()]
+        Array.from(Array(12).keys())
           .map(Number.call, Number)
           .map((tickLabel, indx) => {
             var tick = document.createElement('div')
@@ -243,7 +243,7 @@ The component has been tested on :
         var radius = this._radius
         var radiusTot = this.$.clock.offsetWidth / 2
 
-        ;[...Array(12).keys()]
+        Array.from(Array(12).keys())
           .map(Number.call, Number)
           .map((tickLabel, indx) => {
             var tick = document.createElement('div')
@@ -268,7 +268,7 @@ The component has been tested on :
         var radius = this._radius
         var radiusTot = this.$.clock.offsetWidth / 2
 
-        ;[...Array(60).keys()]
+        Array.from(Array(60).keys())
           .map(Number.call, Number)
           .map((tickLabel, indx) => {
             var tick = document.createElement('div')
@@ -310,7 +310,6 @@ The component has been tested on :
           this.value = 0
         }
         this._selectorPos()
-        console.log('dispatch update')
         this.dispatchEvent(new CustomEvent('update', {detail: this.value}))
       }
 
@@ -322,7 +321,7 @@ The component has been tested on :
           return
         }
         var line
-        var ticks = [].slice.call(this.$.ticks.querySelectorAll('.tick'))
+        var ticks = Array.from(this.$.ticks.querySelectorAll('.tick'))
         ticks[this.value].classList.toggle('select')
         var angleOffset = this.minutes ? 6 : 30
         var theta = (this.value + (this.minutes ? 30 : 6)) * angleOffset
@@ -402,8 +401,7 @@ The component has been tested on :
        */
       _finishSelect() {
         this._down = false
-        console.log('dispatch change')
-        this.dispatchEvent(new CustomEvent('change', {detail: this.value}))
+        this.dispatchEvent(new CustomEvent('change', {detail: this.value, bubble: true}))
       }
     }
 
