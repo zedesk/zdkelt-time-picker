@@ -25,12 +25,12 @@
   <demo-snippet>
     <template>
       <zdkelt-time-picker id="clock1" value="16:25"></zdkelt-time-picker>
-      <div>Update : <span class="update"></span></div>
+      <div>Change : <span class="change"></span></div>
       <script>
         window.addEventListener('WebComponentsReady', () => {
           const clock = document.querySelector('#clock1')
-          clock.addEventListener('update', (evt) => {
-            document.querySelector('.update').innerHTML = evt.detail
+          clock.addEventListener('change', (evt) => {
+            document.querySelector('.change').innerHTML = evt.detail
           }, false)
         })
       </script>
