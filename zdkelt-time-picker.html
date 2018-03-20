@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../polymer/lib/mixins/gesture-event-listeners.html">
-<link rel="import" href="zdkelt-clock.html">
+<link rel="import" href="./zdkelt-clock.html">
 
 <!--
 A time picker component
@@ -22,7 +22,7 @@ Example:
 > __Warning__ component does not yet support the meridiem hours, and is based only on 24-hour clock.
 
 @group zdk Elements
-@demo
+@demo demo/index.html
 -->
 <dom-module id="zdkelt-time-picker">
   <template>
@@ -88,11 +88,11 @@ Example:
       <template is="dom-if" if="{{hour12}}">
         <div id="meridiem">{{meridiem}}</div>
       </template>
-  </div>
-  <div class="box">
+    </div>
+    <div class="box">
       <zdkelt-clock id="hours" value="{{_hours}}" on-change="_dispatchChange" on-update="_hoursUpdate"></zdkelt-clock>
       <zdkelt-clock id="minutes" minutes value="{{_minutes}}" on-change="_dispatchChange" on-update="_minutesUpdate"></zdkelt-clock>
-  </div>
+    </div>
   </template>
   <script>
     class ZdkEltTimePicker extends Polymer.GestureEventListeners(Polymer.Element) {
