@@ -17,12 +17,34 @@
   <div class="vertical-section-container centered">
     <demo-snippet>
       <template>
-        <zdkelt-clock id="clock1" value="16"></zdkelt-clock>
-        <div>Update detail : <span class="clock1Update"></span></div>
-        <div>Change detail : <span class="clock1Change"></span></div>
-        <zdkelt-clock id="clock2" minutes value="22"></zdkelt-clock>
-        <div>Update detail : <span class="clock2Update"></span></div>
-        <div>Change detail : <span class="clock2Change"></span></div>
+        <style>
+        .container {
+          display: flex;
+        }
+        .container > div {
+          margin: 10px 20px;
+          flex: 1;
+          align-items: center;
+          display: flex;
+          flex-direction: column;
+        }
+        .info {
+          width: 100%;
+          line-height: 1.3em;
+        }
+        </style>
+        <div class="container">
+          <div>
+            <zdkelt-clock id="clock1" value="16"></zdkelt-clock>
+            <div class="info">Update detail : <span class="clock1Update"></span></div>
+            <div class="info">Change detail : <span class="clock1Change"></span></div>
+          </div>
+          <div>
+            <zdkelt-clock id="clock2" minutes value="22"></zdkelt-clock>
+            <div class="info">Update detail : <span class="clock2Update"></span></div>
+            <div class="info">Change detail : <span class="clock2Change"></span></div>
+          </div>
+        </div>
         <script>
           window.addEventListener('WebComponentsReady', () => {
             var clock1 = document.querySelector('#clock1')
